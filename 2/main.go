@@ -448,7 +448,8 @@ func codegen(node *Node) {
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "%s: invalid argument", os.Args[0])
+		fmt.Fprintf(os.Stderr, "%s: invalid argument\n", os.Args[0])
+		os.Exit(1)
 	}
 
 	var text []rune

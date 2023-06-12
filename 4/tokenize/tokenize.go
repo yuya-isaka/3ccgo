@@ -1,6 +1,7 @@
-package main
+package tokenize
 
 import (
+	"3ccgo4/header"
 	"unicode"
 )
 
@@ -47,10 +48,17 @@ func readPunct(text []rune, loc int) int {
 	return ispunct(text[loc])
 }
 
-func Tokenize(text []rune) *Token {
-	UserInput = text
+func newToken(kind header.TokenKind, loc int) *header.Token {
+	return &header.Token{
+		Kind: kind,
+		Loc:  loc,
+	}
+}
 
-	var head Token
+func Tokenize(text []rune) *header.Token {
+	header.UserInput = text
+
+	var head header.Token
 	cur := &head
 
 	loc := 0
@@ -61,32 +69,32 @@ func Tokenize(text []rune) *Token {
 		}
 
 		if unicode.IsDigit(text[loc]) {
-			cur.next = newToken(TK_NUM, loc)
-			cur = cur.next
-			cur.val = getNum(text, &loc)
+			cur.Next = newToken(header.TK_NUM, loc)
+			cur = cur.Next
+			cur.Val = getNum(text, &loc)
 			continue
 		}
 
 		punctLen := readPunct(text, loc)
 		if punctLen != 0 {
-			cur.next = newToken(TK_PUNCT, loc)
-			cur = cur.next
-			cur.name = string(text[loc : loc+punctLen])
+			cur.Next = newToken(header.TK_PUNCT, loc)
+			cur = cur.Next
+			cur.Name = string(text[loc : loc+punctLen])
 			loc += punctLen
 			continue
 		}
 
 		if unicode.IsLower(text[loc]) && unicode.IsLetter(text[loc]) {
-			cur.next = newToken(TK_VAR, loc)
-			cur = cur.next
-			cur.name = string(text[loc])
+			cur.Next = newToken(header.TK_VAR, loc)
+			cur = cur.Next
+			cur.Name = string(text[loc])
 			loc++
 			continue
 		}
 
-		ErrorAt(loc, "error tokenize")
+		header.ErrorAt(loc, "error tokenize")
 	}
 
-	cur.next = newToken(TK_EOF, loc-1)
-	return head.next
+	cur.Next = newToken(header.TK_EOF, loc-1)
+	return head.Next
 }

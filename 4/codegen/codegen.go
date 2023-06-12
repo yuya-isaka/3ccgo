@@ -1,6 +1,9 @@
-package main
+package codegen
 
-import "fmt"
+import (
+	"3ccgo4/header"
+	"fmt"
+)
 
 var depth int = 0
 
@@ -14,64 +17,64 @@ func pop(reg string) {
 	depth--
 }
 
-func genAddr(node *Node) {
-	if node.kind != ND_VAR {
-		Errorf("error genAddr")
+func genAddr(node *header.Node) {
+	if node.Kind != header.ND_VAR {
+		header.Errorf("error genAddr")
 	}
 
-	offset := (int(node.name[0]) - 'a' + 1) * 8
+	offset := (int(node.Name[0]) - 'a' + 1) * 8
 	fmt.Printf("	lea %d(%%rbp), %%rax\n", -offset)
 }
 
-func genExpr(node *Node) {
-	switch node.kind {
-	case ND_NUM:
-		fmt.Printf("	mov $%d, %%rax\n", node.val)
+func genExpr(node *header.Node) {
+	switch node.Kind {
+	case header.ND_NUM:
+		fmt.Printf("	mov $%d, %%rax\n", node.Val)
 		return
-	case ND_NEG:
-		genExpr(node.lhs)
+	case header.ND_NEG:
+		genExpr(node.Lhs)
 		fmt.Println("	neg %rax")
 		return
-	case ND_ASSIGN:
-		genAddr(node.lhs)
+	case header.ND_ASSIGN:
+		genAddr(node.Lhs)
 		push()
-		genExpr(node.rhs)
+		genExpr(node.Rhs)
 		pop("%rdi")
 		fmt.Println("	mov %rax, (%rdi)")
 		return
-	case ND_VAR:
+	case header.ND_VAR:
 		genAddr(node)
 		fmt.Println("	mov (%rax), %rax")
 		return
 	}
 
-	genExpr(node.rhs)
+	genExpr(node.Rhs)
 	push()
-	genExpr(node.lhs)
+	genExpr(node.Lhs)
 	pop("%rdi")
 
-	switch node.kind {
-	case ND_ADD:
+	switch node.Kind {
+	case header.ND_ADD:
 		fmt.Println("	add %rdi, %rax")
 		return
-	case ND_SUB:
+	case header.ND_SUB:
 		fmt.Println("	sub %rdi, %rax")
 		return
-	case ND_MUL:
+	case header.ND_MUL:
 		fmt.Println("	imul %rdi, %rax")
 		return
-	case ND_DIV:
+	case header.ND_DIV:
 		fmt.Println("	cqo")
 		fmt.Println("	idiv %rdi")
 		return
-	case ND_EQ, ND_NE, ND_LT, ND_LE:
+	case header.ND_EQ, header.ND_NE, header.ND_LT, header.ND_LE:
 		fmt.Println("	cmp %rdi, %rax")
 
-		if node.kind == ND_EQ {
+		if node.Kind == header.ND_EQ {
 			fmt.Println("	sete %al")
-		} else if node.kind == ND_NE {
+		} else if node.Kind == header.ND_NE {
 			fmt.Println("	setne %al")
-		} else if node.kind == ND_LT {
+		} else if node.Kind == header.ND_LT {
 			fmt.Println("	setl %al")
 		} else {
 			fmt.Println("	setle %al")
@@ -81,10 +84,10 @@ func genExpr(node *Node) {
 		return
 	}
 
-	Errorf("error genExpr")
+	header.Errorf("error genExpr")
 }
 
-func Codegen(node *Node) {
+func Codegen(node *header.Node) {
 	fmt.Println(".globl main")
 	fmt.Println("main:")
 
@@ -92,15 +95,15 @@ func Codegen(node *Node) {
 	fmt.Println("	mov %rsp, %rbp")
 	fmt.Println("	sub $208, %rsp")
 
-	for cur := node; cur != nil; cur = cur.next {
-		if cur.kind == ND_EXPR_STMT {
-			genExpr(cur.lhs)
+	for cur := node; cur != nil; cur = cur.Next {
+		if cur.Kind == header.ND_EXPR_STMT {
+			genExpr(cur.Lhs)
 			if depth != 0 {
-				Errorf("error depth")
+				header.Errorf("error depth")
 			}
 			continue
 		}
-		Errorf("error codegen")
+		header.Errorf("error codegen")
 	}
 
 	fmt.Println("	mov %rbp, %rsp")

@@ -16,7 +16,7 @@ test() {
 	fi
 }
 
-go build -o 3ccgo main.go header.go tokenize.go parse.go codegen.go
+go build -o 3ccgo main.go
 echo Build OK
 
 test '  10 ;' 10

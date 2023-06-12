@@ -1,4 +1,4 @@
-package main
+package header
 
 import (
 	"fmt"
@@ -19,13 +19,6 @@ func ErrorAt(loc int, msg string) {
 	Errorf(msg)
 }
 
-func newToken(kind TokenKind, loc int) *Token {
-	return &Token{
-		kind: kind,
-		loc:  loc,
-	}
-}
-
 type TokenKind int
 
 const (
@@ -36,11 +29,11 @@ const (
 )
 
 type Token struct {
-	kind TokenKind
-	next *Token
-	loc  int
-	val  int
-	name string
+	Kind TokenKind
+	Next *Token
+	Loc  int
+	Val  int
+	Name string
 }
 
 type NodeKind int
@@ -62,10 +55,10 @@ const (
 )
 
 type Node struct {
-	kind NodeKind
-	next *Node
-	lhs  *Node
-	rhs  *Node
-	val  int
-	name string
+	Kind NodeKind
+	Next *Node
+	Lhs  *Node
+	Rhs  *Node
+	Val  int
+	Name string
 }

@@ -32,9 +32,9 @@ func newVar(name string) *header.Node {
 }
 
 func stmt(tok *header.Token) (*header.Node, *header.Token) {
-	var lhs *header.Node
-	lhs, tok = expr(tok)
+	lhs, tok := expr(tok)
 	node := newUnary(header.ND_EXPR_STMT, lhs)
+
 	if tok.Name != ";" {
 		header.ErrorAt(tok.Loc, "error stmt")
 	}
@@ -46,8 +46,7 @@ func expr(tok *header.Token) (*header.Node, *header.Token) {
 }
 
 func assign(tok *header.Token) (*header.Node, *header.Token) {
-	var node *header.Node
-	node, tok = equivalent(tok)
+	node, tok := equivalent(tok)
 
 	if tok.Name == "=" {
 		var rhs *header.Node
@@ -58,8 +57,7 @@ func assign(tok *header.Token) (*header.Node, *header.Token) {
 }
 
 func equivalent(tok *header.Token) (*header.Node, *header.Token) {
-	var node *header.Node
-	node, tok = relation(tok)
+	node, tok := relation(tok)
 
 	for {
 		var rhs *header.Node
@@ -81,8 +79,7 @@ func equivalent(tok *header.Token) (*header.Node, *header.Token) {
 }
 
 func relation(tok *header.Token) (*header.Node, *header.Token) {
-	var node *header.Node
-	node, tok = add(tok)
+	node, tok := add(tok)
 
 	for {
 		var rhs *header.Node
@@ -116,8 +113,7 @@ func relation(tok *header.Token) (*header.Node, *header.Token) {
 }
 
 func add(tok *header.Token) (*header.Node, *header.Token) {
-	var node *header.Node
-	node, tok = mul(tok)
+	node, tok := mul(tok)
 
 	for {
 		var rhs *header.Node
@@ -139,8 +135,7 @@ func add(tok *header.Token) (*header.Node, *header.Token) {
 }
 
 func mul(tok *header.Token) (*header.Node, *header.Token) {
-	var node *header.Node
-	node, tok = unary(tok)
+	node, tok := unary(tok)
 
 	for {
 		var rhs *header.Node

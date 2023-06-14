@@ -108,5 +108,17 @@ type Node struct {
 	Lhs  *Node
 	Rhs  *Node
 	Val  int
-	Name string
+	Var  *Obj
+}
+
+type Obj struct {
+	Next   *Obj
+	Name   string
+	Offset int
+}
+
+type Function struct {
+	Body      *Node
+	Locals    *Obj
+	Stacksize int
 }

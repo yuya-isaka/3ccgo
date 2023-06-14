@@ -53,6 +53,10 @@ func readPunct(text []rune, i int) int {
 	return isPunct(text[i])
 }
 
+func isIdent(target rune) bool {
+	return (unicode.IsLower(target) && unicode.IsLetter(target)) || (unicode.IsUpper(target) && unicode.IsLetter(target)) || target == '_'
+}
+
 func Tokenize(text []rune) *header.Token {
 	header.Userinput = text
 
@@ -82,11 +86,17 @@ func Tokenize(text []rune) *header.Token {
 			continue
 		}
 
-		if unicode.IsLower(text[i]) && unicode.IsLetter(text[i]) {
-			cur.Next = newToken(header.TkVar, i)
-			cur = cur.Next
-			cur.Name = string(text[i])
+		if isIdent(text[i]) {
+			result := []rune{text[i]}
+			index := i
 			i++
+			for i < len(text) && (isIdent(text[i]) || unicode.IsDigit(text[i])) {
+				result = append(result, text[i])
+				i++
+			}
+			cur.Next = newToken(header.TkVar, index)
+			cur = cur.Next
+			cur.Name = string(result)
 			continue
 		}
 

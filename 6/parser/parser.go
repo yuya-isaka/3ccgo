@@ -2,6 +2,17 @@ package parser
 
 import "3ccgo6/header"
 
+var locals *header.Obj
+
+func findVar(tok *header.Token) *header.Obj {
+	for variable := locals; variable != nil; variable = variable.Next {
+		if variable.Name == tok.Name {
+			return variable
+		}
+	}
+	return nil
+}
+
 func newUnary(kind header.NodeKind, lhs *header.Node) *header.Node {
 	return &header.Node{
 		Kind: kind,
@@ -24,11 +35,20 @@ func newNum(val int) *header.Node {
 	}
 }
 
-func newVar(name string) *header.Node {
+func newVar(variable *header.Obj) *header.Node {
 	return &header.Node{
 		Kind: header.NdVar,
-		Name: name,
+		Var:  variable,
 	}
+}
+
+func newLvar(name string) *header.Obj {
+	obj := &header.Obj{
+		Name: name,
+		Next: locals,
+	}
+	locals = obj
+	return obj
 }
 
 func stmt(tok *header.Token) (*header.Node, *header.Token) {
@@ -184,14 +204,18 @@ func primary(tok *header.Token) (*header.Node, *header.Token) {
 	}
 
 	if tok.Kind == header.TkVar {
-		return newVar(tok.Name), tok.Next
+		variable := findVar(tok)
+		if variable == nil {
+			variable = newLvar(tok.Name)
+		}
+		return newVar(variable), tok.Next
 	}
 
 	header.ErrorAt(tok.Loc, "Error primary last")
 	return nil, nil
 }
 
-func Parser(tok *header.Token) *header.Node {
+func Parser(tok *header.Token) *header.Function {
 	var head header.Node
 	cur := &head
 
@@ -200,5 +224,8 @@ func Parser(tok *header.Token) *header.Node {
 		cur = cur.Next
 	}
 
-	return head.Next
+	return &header.Function{
+		Body:   head.Next,
+		Locals: locals,
+	}
 }

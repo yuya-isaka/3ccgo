@@ -80,5 +80,12 @@ test 'a=3; b=4; a+b;' 7
 test 'a=- - -3; b = 3 + -2 + 10 * 2 / (10/2); b-a;' 8
 test 'a=10; z = 3; y = a*z; y;' 30
 test 'a=10; (c=3); a+c;' 13
+test  'a=3; a;'	3
+test  'a=3; z=5; a+z;' 8
+test  'a=3; a;' 3
+test  'a=3; z=5; a+z;' 8
+test  'a=b=3; a+b;' 6
+test  'foo=3; foo;' 3
+test  'foo123=3; bar=5; foo123+bar;' 8
 
 echo -------------------- Ok -----------------------

@@ -21,8 +21,7 @@ func genAddr(node *header.Node) {
 	if node.Kind != header.NdVar {
 		header.Errorf("error genAddr")
 	}
-	offset := (int(rune(node.Name[0])) - 'a' + 1) * 8
-	fmt.Printf("	lea %d(%%rbp), %%rax\n", -offset)
+	fmt.Printf("	lea %d(%%rbp), %%rax\n", node.Var.Offset)
 }
 
 func genExpr(node *header.Node) {
@@ -86,15 +85,30 @@ func genExpr(node *header.Node) {
 	header.Errorf("error genexpr")
 }
 
-func Codegen(node *header.Node) {
+func alignTo(n int, align int) int {
+	return (n + align - 1) / align * align
+}
+
+func assignLvarOffset(prog *header.Function) {
+	offset := 0
+	for variable := prog.Locals; variable != nil; variable = variable.Next {
+		offset += 8
+		variable.Offset = -offset
+	}
+	prog.Stacksize = alignTo(offset, 16)
+}
+
+func Codegen(prog *header.Function) {
+	assignLvarOffset(prog)
+
 	fmt.Println(".globl main")
 	fmt.Println("main:")
 
 	fmt.Println("	push %rbp")
 	fmt.Println("	mov %rsp, %rbp")
-	fmt.Printf("	sub $208, %%rsp\n")
+	fmt.Printf("	sub $%d, %%rsp\n", prog.Stacksize)
 
-	for cur := node; cur != nil; cur = cur.Next {
+	for cur := prog.Body; cur != nil; cur = cur.Next {
 		if cur.Kind != header.NdExprStmt {
 			header.Errorf("Error Codegen NdExprStmt")
 		}

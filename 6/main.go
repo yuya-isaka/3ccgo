@@ -19,7 +19,7 @@ func lhsrhsDebug(node *header.Node) {
 		if node.Lhs.Kind == header.NdNum {
 			fmt.Printf(" → %v", node.Lhs.Val)
 		} else if node.Lhs.Kind == header.NdVar {
-			fmt.Printf(" → %v", node.Lhs.Name)
+			fmt.Printf(" → %v", node.Lhs.Var.Name)
 		}
 		fmt.Println("")
 
@@ -35,7 +35,7 @@ func lhsrhsDebug(node *header.Node) {
 		if node.Rhs.Kind == header.NdNum {
 			fmt.Printf(" → %v", node.Rhs.Val)
 		} else if node.Rhs.Kind == header.NdVar {
-			fmt.Printf(" → %v", node.Rhs.Name)
+			fmt.Printf(" → %v", node.Rhs.Var.Name)
 		}
 		fmt.Println("")
 
@@ -59,14 +59,14 @@ func main() {
 
 	// // Debug ----------------------------------------------------------------------
 	// for cur := tok; cur != nil; cur = cur.Next {
-	// 	fmt.Printf("kind: %v, val: %v, Name: %v\n", cur.Kind, cur.Val, cur.Name)
+	// 	fmt.Printf("kind: %v \t val: %v \t Name: %v\n", cur.Kind, cur.Val, cur.Name)
 	// }
 	// // ----------------------------------------------------------------------------
 
-	node := parser.Parser(tok)
+	function := parser.Parser(tok)
 
 	// // Debug ----------------------------------------------------------------------
-	// for cur := node; cur != nil; cur = cur.Next {
+	// for cur := function.Body; cur != nil; cur = cur.Next {
 	// 	fmt.Printf("\n ---Kind: %v---\n", cur.Kind)
 
 	// 	lhsrhsDebug(cur)
@@ -74,5 +74,5 @@ func main() {
 	// fmt.Println("")
 	// // ----------------------------------------------------------------------------
 
-	codegen.Codegen(node)
+	codegen.Codegen(function)
 }
